@@ -1,3 +1,3 @@
 gen:
 	rm ./internal/model/*
-	gen -c ./gen.tool
+	gentool -c ./gen.tool

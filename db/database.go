@@ -11,7 +11,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"gorm.io/gorm/schema"
 )
 
 const (
@@ -20,11 +19,7 @@ const (
 	lifetimeRangeMax   = 65
 )
 
-var GormConfig = &gorm.Config{
-	NamingStrategy: &schema.NamingStrategy{
-		SingularTable: true,
-	},
-}
+var GormConfig = &gorm.Config{}
 
 func NewDB(env config.Env) (*gorm.DB, error) {
 	return newDB(env, dsn(env))
@@ -43,6 +38,7 @@ func newDB(env config.Env, dsn string) (*gorm.DB, error) {
 		log.Infof("Failed get sql.DB : %s", err)
 		return nil, err
 	}
+
 	db.SetMaxIdleConns(maxIdleConnections)
 	db.SetMaxOpenConns(maxOpenConnections)
 	db.SetConnMaxLifetime(lifetimeRangeMax * time.Minute)
