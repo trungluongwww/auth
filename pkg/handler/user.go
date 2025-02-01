@@ -80,3 +80,20 @@ func (h *User) Me(context echo.Context) error {
 	}
 	return context.JSON(http.StatusOK, res)
 }
+
+func (h *User) RefreshToken(context echo.Context) error {
+	var (
+		ctx   = custom.NewEchoCustom(context)
+		input = &request.RefreshTokenPayload{}
+	)
+	err := input.Bind(ctx)
+	if err != nil {
+		return context.JSON(http.StatusBadRequest, echo.Map{"message": err.Error()})
+	}
+
+	res, err := h.UsecaseUser.RefreshToken(ctx.CurrentCtx(), input)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, echo.Map{"message": err.Error()})
+	}
+	return context.JSON(http.StatusOK, res)
+}

@@ -13,15 +13,6 @@ type User interface {
 	Delete(doc *model.User) error
 	FirstRaw(cond *model.User) (*model.User, error)
 	FindByCondition(cond query.CommonCondition) ([]*query.UserResult, error)
-
-	// account
-	FirstAccountRaw(cond *model.Account) (*model.Account, error)
-	InsertAccount(doc *model.Account) error
-	UpdateAccount(doc *model.Account) error
-
-	// account refresh token
-	InsertAccountRefreshToken(doc *model.AccountRefreshToken) error
-	UpdateAccountRefreshToken(doc *model.AccountRefreshToken) error
 }
 
 type user struct {
@@ -69,30 +60,4 @@ func (r *user) FindByCondition(cond query.CommonCondition) ([]*query.UserResult,
 	}
 
 	return results, nil
-}
-
-func (r *user) FirstAccountRaw(cond *model.Account) (*model.Account, error) {
-	var result *model.Account
-	err := r.Tx.Where(cond).First(&result).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (r *user) InsertAccount(doc *model.Account) error {
-	return r.Tx.Omit(clause.Associations).Create(doc).Error
-}
-
-func (r *user) UpdateAccount(doc *model.Account) error {
-	return r.Tx.Omit(clause.Associations).Updates(doc).Error
-}
-
-func (r *user) InsertAccountRefreshToken(doc *model.AccountRefreshToken) error {
-	return r.Tx.Omit(clause.Associations).Create(doc).Error
-}
-
-func (r *user) UpdateAccountRefreshToken(doc *model.AccountRefreshToken) error {
-	return r.Tx.Omit(clause.Associations).Updates(doc).Error
 }

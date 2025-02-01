@@ -7,6 +7,7 @@ import (
 type Repository interface {
 	NewTransaction(fc func(tx Repository) error) error
 	NewUser() User
+	NewAccount() Account
 }
 
 type repositoryIml struct {
@@ -25,4 +26,8 @@ func (r *repositoryIml) NewTransaction(fc func(tx Repository) error) error {
 
 func (r *repositoryIml) NewUser() User {
 	return newUser(r.db)
+}
+
+func (r *repositoryIml) NewAccount() Account {
+	return newAccount(r.db)
 }

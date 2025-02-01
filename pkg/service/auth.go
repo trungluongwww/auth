@@ -11,7 +11,7 @@ import (
 
 type AuthService interface {
 	ConvertToAccountModel(password string) (*model.Account, error)
-	GenerateAccessToken(account *model.Account, email string) (*response.AccessResponse, *model.AccountRefreshToken, error)
+	GenerateAccessToken(accountID uint32, email string) (*response.AccessResponse, *model.AccountRefreshToken, error)
 }
 
 type authService struct {
@@ -52,16 +52,16 @@ func (authService) CheckAccountLogin(password string, account *model.Account) er
 	return nil
 }
 
-func (s authService) GenerateAccessToken(account *model.Account, email string) (*response.AccessResponse, *model.AccountRefreshToken, error) {
+func (s authService) GenerateAccessToken(accountID uint32, email string) (*response.AccessResponse, *model.AccountRefreshToken, error) {
 	ID, _ := uuid.NewUUID()
-	accessToken, err := s.Signer.SignUser(ID, int(account.ID), email)
+	accessToken, err := s.Signer.SignUser(ID, int(accountID), email)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	refreshToken, _ := uuid.NewUUID()
 	accountRefreshToken := &model.AccountRefreshToken{
-		AccountID:     account.ID,
+		AccountID:     accountID,
 		Token:         refreshToken.String(),
 		AccessTokenID: ID.String(),
 	}

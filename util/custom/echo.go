@@ -8,12 +8,12 @@ import (
 	"strconv"
 )
 
-type EchoCustom struct {
-	echo.Context
-}
-
 func NewEchoCustom(c echo.Context) *EchoCustom {
 	return &EchoCustom{c}
+}
+
+type EchoCustom struct {
+	echo.Context
 }
 
 func (c *EchoCustom) CurrentCtx() context.Context {
