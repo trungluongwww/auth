@@ -8,14 +8,14 @@ import (
 	"github.com/trungluongwww/auth/pkg/model/response"
 	"github.com/trungluongwww/auth/pkg/repository"
 	"github.com/trungluongwww/auth/pkg/service"
+	"github.com/trungluongwww/auth/third_party/social"
 )
 
 type User interface {
 	Register(context context.Context, p request.RegisterPayload) error
 	Login(context context.Context, p request.LoginPayload) (*response.LoginResponse, error)
 	RefreshToken(context context.Context, p *request.RefreshTokenPayload) (*response.LoginResponse, error)
-	LoginWithFacebook(context context.Context) error
-	LoginWithGoogle(context context.Context) error
+	LoginWithFacebook(context context.Context, p request.FacebookLoginPayload) (*response.LoginResponse, error)
 	GetMe(context context.Context, id int) (*response.UserResponse, error)
 }
 
@@ -23,20 +23,23 @@ type userImpl struct {
 	Repository  repository.Repository
 	AuthService service.AuthService
 	UserService service.UserService
+	Social      social.Social
 }
 
-func NewUser(repository repository.Repository, authService service.AuthService, userService service.UserService) User {
+func NewUser(repository repository.Repository, authService service.AuthService, userService service.UserService,
+	social social.Social) User {
 	return &userImpl{
 		Repository:  repository,
 		AuthService: authService,
 		UserService: userService,
+		Social:      social,
 	}
 }
 
 func (u *userImpl) Register(context context.Context, p request.RegisterPayload) error {
-	exist, _ := u.Repository.NewUser().FirstRaw(&model.User{Email: p.Email})
-	if exist != nil {
-		return errors.New("user already exist")
+	user, _ := u.Repository.NewUser().FirstRaw(&model.User{Email: p.Email})
+	if user != nil {
+		return errors.New("user already user")
 	}
 
 	err := u.Repository.NewTransaction(func(tx repository.Repository) error {
@@ -54,7 +57,7 @@ func (u *userImpl) Register(context context.Context, p request.RegisterPayload) 
 			return err
 		}
 
-		user := u.UserService.ConvertRegisterPayloadToModel(p, account)
+		user := u.UserService.ConvertRegisterPayloadToModel(p, account, false)
 		err = userDao.Insert(user)
 		if err != nil {
 			return err
@@ -73,21 +76,21 @@ func (u *userImpl) Login(context context.Context, p request.LoginPayload) (*resp
 	var (
 		accountDao = u.Repository.NewAccount()
 	)
-	exist, err := u.Repository.NewUser().FirstRaw(&model.User{Email: p.Email})
+	user, err := u.Repository.NewUser().FirstRaw(&model.User{Email: p.Email})
 	if err != nil {
 		return nil, err
 	}
 
-	if exist.IsBanned {
+	if user.IsBanned {
 		return nil, errors.New("user is banned")
 	}
 
-	account, err := accountDao.FirstRaw(&model.Account{ID: exist.AccountID})
+	account, err := accountDao.FirstRaw(&model.Account{ID: user.AccountID})
 	if err != nil {
 		return nil, err
 	}
 
-	accessTokenRes, rf, err := u.AuthService.GenerateAccessToken(account.ID, exist.Email)
+	accessTokenRes, rf, err := u.AuthService.GenerateAccessToken(account.ID, user.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +100,7 @@ func (u *userImpl) Login(context context.Context, p request.LoginPayload) (*resp
 		return nil, err
 	}
 
-	userRes := u.UserService.ConvertToUserResponse(exist)
+	userRes := u.UserService.ConvertToUserResponse(user)
 
 	return &response.LoginResponse{
 		User:           *userRes,
@@ -105,21 +108,89 @@ func (u *userImpl) Login(context context.Context, p request.LoginPayload) (*resp
 	}, nil
 }
 
-func (u *userImpl) LoginWithFacebook(context context.Context) error {
-	return nil
-}
-
-func (u *userImpl) LoginWithGoogle(context context.Context) error {
-	return nil
-}
-
-func (u *userImpl) GetMe(context context.Context, id int) (*response.UserResponse, error) {
-	exist, err := u.Repository.NewUser().FirstRaw(&model.User{ID: uint32(id)})
+func (u *userImpl) LoginWithFacebook(context context.Context, p request.FacebookLoginPayload) (*response.LoginResponse, error) {
+	fbData, err := u.Social.GetFacebookInfo(p.Token)
 	if err != nil {
 		return nil, err
 	}
 
-	return u.UserService.ConvertToUserResponse(exist), nil
+	user, err := u.Repository.NewUser().FirstRaw(&model.User{Email: fbData.Email})
+	if err != nil {
+		return nil, err
+	}
+
+	res := &response.LoginResponse{}
+
+	if user != nil {
+		accessTokenRes, rf, err := u.AuthService.GenerateAccessToken(user.AccountID, user.Email)
+		if err != nil {
+			return nil, err
+		}
+
+		err = u.Repository.NewAccount().InsertAccountRefreshToken(rf)
+		if err != nil {
+			return nil, err
+		}
+
+		res.User = *u.UserService.ConvertToUserResponse(user)
+		res.AccessResponse = *accessTokenRes
+	} else {
+		err = u.Repository.NewTransaction(func(tx repository.Repository) error {
+			var (
+				userDao    = tx.NewUser()
+				accountDao = tx.NewAccount()
+			)
+
+			account, err := u.AuthService.ConvertToAccountModel("")
+			if err != nil {
+				return err
+			}
+
+			err = accountDao.Insert(account)
+			if err != nil {
+				return err
+			}
+
+			payload := request.RegisterPayload{
+				Email: fbData.Email,
+				Name:  fbData.Name,
+			}
+
+			newUser := u.UserService.ConvertRegisterPayloadToModel(payload, account, true)
+			err = userDao.Insert(newUser)
+			if err != nil {
+				return err
+			}
+
+			accessTokenRes, rf, err := u.AuthService.GenerateAccessToken(account.ID, newUser.Email)
+			if err != nil {
+				return err
+			}
+
+			err = accountDao.InsertAccountRefreshToken(rf)
+			if err != nil {
+				return err
+			}
+
+			res.User = *u.UserService.ConvertToUserResponse(newUser)
+			res.AccessResponse = *accessTokenRes
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return res, nil
+}
+
+func (u *userImpl) GetMe(context context.Context, id int) (*response.UserResponse, error) {
+	user, err := u.Repository.NewUser().FirstRaw(&model.User{ID: uint32(id)})
+	if err != nil {
+		return nil, err
+	}
+
+	return u.UserService.ConvertToUserResponse(user), nil
 }
 
 func (u *userImpl) RefreshToken(context context.Context, p *request.RefreshTokenPayload) (*response.LoginResponse, error) {

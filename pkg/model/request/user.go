@@ -55,3 +55,19 @@ func (i *RefreshTokenPayload) Bind(ctx echo.Context) error {
 
 	return i.Validate()
 }
+
+type FacebookLoginPayload struct {
+	Token string `json:"token" validate:"required"`
+}
+
+func (i *FacebookLoginPayload) Validate() error {
+	return validator.New().Struct(i)
+}
+func (i *FacebookLoginPayload) Bind(ctx echo.Context) error {
+	err := ctx.Bind(i)
+	if err != nil {
+		return err
+	}
+
+	return i.Validate()
+}

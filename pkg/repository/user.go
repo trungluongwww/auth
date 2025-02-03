@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/trungluongwww/auth/internal/model"
 	"github.com/trungluongwww/auth/pkg/model/query"
 	"gorm.io/gorm"
@@ -39,6 +40,9 @@ func (r *user) FirstRaw(cond *model.User) (*model.User, error) {
 	var result *model.User
 	err := r.Tx.Where(cond).First(&result).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -56,6 +60,9 @@ func (r *user) FindByCondition(cond query.CommonCondition) ([]*query.UserResult,
 	tx = cond.AssignPagination(tx)
 
 	if err := tx.Find(&results).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return results, nil
+		}
 		return results, err
 	}
 

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/trungluongwww/auth/internal/model"
 	"github.com/trungluongwww/auth/pkg/model/query"
@@ -31,6 +32,9 @@ func (r *account) FirstRaw(cond *model.Account) (*model.Account, error) {
 	var result *model.Account
 	err := r.Tx.Where(cond).First(&result).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 
@@ -61,6 +65,9 @@ func (r *account) FirstByRefreshToken(refreshToken string) (*query.AccountResult
 
 	result := &query.AccountResult{}
 	if err := tx.First(&result).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 

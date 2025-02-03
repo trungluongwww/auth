@@ -7,7 +7,7 @@ import (
 )
 
 type UserService interface {
-	ConvertRegisterPayloadToModel(p request.RegisterPayload, account *model.Account) *model.User
+	ConvertRegisterPayloadToModel(p request.RegisterPayload, account *model.Account, isFirstLogin bool) *model.User
 	ConvertToUserResponse(doc *model.User) *response.UserResponse
 }
 
@@ -18,7 +18,7 @@ func NewUserService() UserService {
 	return &userService{}
 }
 
-func (userService) ConvertRegisterPayloadToModel(p request.RegisterPayload, account *model.Account) *model.User {
+func (userService) ConvertRegisterPayloadToModel(p request.RegisterPayload, account *model.Account, isFirstLogin bool) *model.User {
 	return &model.User{
 		AccountID: account.ID,
 		Email:     p.Email,

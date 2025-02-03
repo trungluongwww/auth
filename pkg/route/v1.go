@@ -15,6 +15,7 @@ func newV1(e *echo.Group, r *register.Register, cfg config.Env) {
 	// guest
 	e.GET("/ping", userHandler.Ping)
 	e.POST("/login", userHandler.Login)
+	e.POST("/facebook", userHandler.LoginWithFacebook)
 	e.POST("/register", userHandler.Register)
 	e.POST("/refresh-token", userHandler.RefreshToken)
 

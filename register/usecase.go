@@ -6,5 +6,5 @@ import (
 )
 
 func (r *Register) NewUsecaseUser() usecase.User {
-	return usecase.NewUser(r.Repository, service.NewAuthService(r.Signer), service.NewUserService())
+	return usecase.NewUser(r.Repository, service.NewAuthService(r.Signer), service.NewUserService(), r.Social)
 }
