@@ -162,6 +162,12 @@ func (u *userImpl) LoginWithFacebook(context context.Context, p request.Facebook
 				return err
 			}
 
+			newFBLogin := u.UserService.ConvertToUserFacebookLogin(newUser, *fbData)
+			err = userDao.InsertUserFacebookLogin(newFBLogin)
+			if err != nil {
+				return err
+			}
+
 			accessTokenRes, rf, err := u.AuthService.GenerateAccessToken(account.ID, newUser.Email)
 			if err != nil {
 				return err

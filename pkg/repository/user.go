@@ -14,6 +14,8 @@ type User interface {
 	Delete(doc *model.User) error
 	FirstRaw(cond *model.User) (*model.User, error)
 	FindByCondition(cond query.CommonCondition) ([]*query.UserResult, error)
+
+	InsertUserFacebookLogin(doc *model.UserFacebookLogin) error
 }
 
 type user struct {
@@ -67,4 +69,8 @@ func (r *user) FindByCondition(cond query.CommonCondition) ([]*query.UserResult,
 	}
 
 	return results, nil
+}
+
+func (r *user) InsertUserFacebookLogin(doc *model.UserFacebookLogin) error {
+	return r.Tx.Create(doc).Error
 }
