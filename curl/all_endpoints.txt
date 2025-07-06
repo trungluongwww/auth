@@ -1,0 +1,360 @@
+=== Complete API Endpoints Reference ===
+Base URL: http://localhost:8080/api/v1
+
+=============================================================================
+AUTHENTICATION ENDPOINTS (No Auth Required)
+=============================================================================
+
+1. PING (Health Check)
+curl -X GET http://localhost:8080/api/v1/ping
+
+2. REGISTER
+curl -X POST http://localhost:8080/api/v1/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "name": "John Doe",
+    "password": "password123"
+  }'
+
+3. LOGIN
+curl -X POST http://localhost:8080/api/v1/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password123"
+  }'
+
+4. FACEBOOK LOGIN
+curl -X POST http://localhost:8080/api/v1/facebook \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "facebook_access_token_here"
+  }'
+
+5. REFRESH TOKEN
+curl -X POST http://localhost:8080/api/v1/refresh-token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }'
+
+=============================================================================
+USER ENDPOINTS (Auth Required)
+=============================================================================
+
+6. GET ME (Current User)
+curl -X GET http://localhost:8080/api/v1/users/me \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+=============================================================================
+POST ENDPOINTS (Auth Required)
+=============================================================================
+
+7. CREATE POST
+curl -X POST http://localhost:8080/api/v1/posts \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "title": "My First Post",
+    "content": "This is the content of my first post.",
+    "imageUrl": "https://example.com/image.jpg",
+    "isPublic": true
+  }'
+
+8. GET POST
+curl -X GET http://localhost:8080/api/v1/posts/1 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+9. GET POSTS (List with Pagination)
+curl -X GET "http://localhost:8080/api/v1/posts?page=1&limit=10&search=test" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+10. GET USER POSTS
+curl -X GET "http://localhost:8080/api/v1/users/1/posts?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+11. UPDATE POST
+curl -X PUT http://localhost:8080/api/v1/posts/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "title": "Updated Post Title",
+    "content": "Updated content here.",
+    "imageUrl": "https://example.com/new-image.jpg",
+    "isPublic": false
+  }'
+
+12. DELETE POST
+curl -X DELETE http://localhost:8080/api/v1/posts/1 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+13. LIKE POST
+curl -X POST http://localhost:8080/api/v1/posts/like \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "postId": 1
+  }'
+
+14. UNLIKE POST
+curl -X DELETE http://localhost:8080/api/v1/posts/like \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "postId": 1
+  }'
+
+=============================================================================
+COMMENT ENDPOINTS (Future Implementation)
+=============================================================================
+
+15. CREATE COMMENT
+curl -X POST http://localhost:8080/api/v1/comments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "postId": 1,
+    "parentId": null,
+    "content": "This is a comment on the post."
+  }'
+
+16. GET POST COMMENTS
+curl -X GET "http://localhost:8080/api/v1/posts/1/comments?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+17. UPDATE COMMENT
+curl -X PUT http://localhost:8080/api/v1/comments/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "content": "Updated comment content."
+  }'
+
+18. DELETE COMMENT
+curl -X DELETE http://localhost:8080/api/v1/comments/1 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+19. LIKE COMMENT
+curl -X POST http://localhost:8080/api/v1/comments/like \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "commentId": 1
+  }'
+
+20. UNLIKE COMMENT
+curl -X DELETE http://localhost:8080/api/v1/comments/like \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "commentId": 1
+  }'
+
+=============================================================================
+USER PROFILE & FOLLOW ENDPOINTS (Future Implementation)
+=============================================================================
+
+21. GET USER PROFILE
+curl -X GET http://localhost:8080/api/v1/users/1/profile \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+22. UPDATE USER PROFILE
+curl -X PUT http://localhost:8080/api/v1/users/profile \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "name": "Updated Name",
+    "bio": "My updated bio",
+    "avatarUrl": "https://example.com/avatar.jpg"
+  }'
+
+23. FOLLOW USER
+curl -X POST http://localhost:8080/api/v1/users/follow \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "userId": 2
+  }'
+
+24. UNFOLLOW USER
+curl -X DELETE http://localhost:8080/api/v1/users/follow \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "userId": 2
+  }'
+
+25. GET FOLLOWERS
+curl -X GET "http://localhost:8080/api/v1/users/1/followers?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+26. GET FOLLOWING
+curl -X GET "http://localhost:8080/api/v1/users/1/following?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+=============================================================================
+FEED ENDPOINTS (Future Implementation)
+=============================================================================
+
+27. GET FEED (Following Posts)
+curl -X GET "http://localhost:8080/api/v1/feed?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+28. GET TRENDING POSTS
+curl -X GET "http://localhost:8080/api/v1/posts/trending?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+=============================================================================
+SEARCH ENDPOINTS (Future Implementation)
+=============================================================================
+
+29. SEARCH USERS
+curl -X GET "http://localhost:8080/api/v1/search/users?q=john&page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+30. SEARCH POSTS
+curl -X GET "http://localhost:8080/api/v1/search/posts?q=technology&page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+=============================================================================
+NOTIFICATION ENDPOINTS (Future Implementation)
+=============================================================================
+
+31. GET NOTIFICATIONS
+curl -X GET "http://localhost:8080/api/v1/notifications?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+32. MARK NOTIFICATION READ
+curl -X PUT http://localhost:8080/api/v1/notifications/1/read \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+33. MARK ALL NOTIFICATIONS READ
+curl -X PUT http://localhost:8080/api/v1/notifications/read-all \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+=============================================================================
+SETTINGS ENDPOINTS (Future Implementation)
+=============================================================================
+
+34. GET USER SETTINGS
+curl -X GET http://localhost:8080/api/v1/users/settings \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+35. UPDATE USER SETTINGS
+curl -X PUT http://localhost:8080/api/v1/users/settings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "emailNotifications": true,
+    "pushNotifications": false,
+    "privacyLevel": "public"
+  }'
+
+=============================================================================
+UTILITY ENDPOINTS (Future Implementation)
+=============================================================================
+
+36. UPLOAD IMAGE
+curl -X POST http://localhost:8080/api/v1/upload/image \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -F "file=@/path/to/image.jpg"
+
+37. DELETE ACCOUNT
+curl -X DELETE http://localhost:8080/api/v1/users/account \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "password": "current_password"
+  }'
+
+38. CHANGE PASSWORD
+curl -X PUT http://localhost:8080/api/v1/users/password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "currentPassword": "old_password",
+    "newPassword": "new_password123"
+  }'
+
+=============================================================================
+QUICK REFERENCE - COMMON HEADERS
+=============================================================================
+
+Authentication Header:
+-H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+Content Type for JSON:
+-H "Content-Type: application/json"
+
+=============================================================================
+QUICK REFERENCE - COMMON PARAMETERS
+=============================================================================
+
+Pagination:
+?page=1&limit=10
+
+Search:
+?search=keyword
+
+User ID in URL:
+/users/{userId}
+
+Post ID in URL:
+/posts/{postId}
+
+Comment ID in URL:
+/comments/{commentId}
+
+=============================================================================
+ERROR RESPONSES
+=============================================================================
+
+400 Bad Request:
+{
+  "error": "Validation failed",
+  "details": ["Field 'email' is required"]
+}
+
+401 Unauthorized:
+{
+  "error": "Invalid or expired token"
+}
+
+403 Forbidden:
+{
+  "error": "You don't have permission to perform this action"
+}
+
+404 Not Found:
+{
+  "error": "Resource not found"
+}
+
+500 Internal Server Error:
+{
+  "error": "Internal server error"
+}
+
+=============================================================================
+SUCCESS RESPONSE PATTERNS
+=============================================================================
+
+Single Resource:
+{
+  "id": 1,
+  "field1": "value1",
+  "field2": "value2"
+}
+
+List Response:
+{
+  "items": [...],
+  "totalCount": 100,
+  "page": 1,
+  "limit": 10
+}
+
+Empty Success:
+Status: 200 OK
+Body: Empty or {"message": "Success"} 

@@ -10,9 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-const TableNameAccount = "account"
+const TableNameAccount = "accounts"
 
-// Account mapped from table <account>
+// Account mapped from table <accounts>
 type Account struct {
 	ID         uint32         `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
 	CreatedAt  time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP" json:"created_at"`

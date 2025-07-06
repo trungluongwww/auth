@@ -19,7 +19,7 @@ type User struct {
 	UpdatedAt    time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP" json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
 	AccountID    uint32         `gorm:"column:account_id;not null;index:account_id,priority:1" json:"account_id"`
-	Email        string         `gorm:"column:email;not null" json:"email"`
+	Email        string         `gorm:"column:email;not null;index:user_idx_email,priority:1" json:"email"`
 	Name         string         `gorm:"column:name;not null" json:"name"`
 	IsBanned     bool           `gorm:"column:is_banned;not null" json:"is_banned"`
 	IsFirstLogin bool           `gorm:"column:is_first_login;not null" json:"is_first_login"`

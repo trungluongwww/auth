@@ -10,9 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-const TableNameUserFacebookLogin = "user_facebook_login"
+const TableNameUserFacebookLogin = "user_facebook_logins"
 
-// UserFacebookLogin mapped from table <user_facebook_login>
+// UserFacebookLogin mapped from table <user_facebook_logins>
 type UserFacebookLogin struct {
 	ID        uint32         `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
 	CreatedAt time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP" json:"created_at"`

@@ -11,7 +11,7 @@ create table account
     primary key (id)
 ) engine=innodb default charset=utf8mb4;
 
-create table account_refresh_token
+create table account_refresh_tokens
 (
     id              integer unsigned      not null auto_increment,
     created_at      datetime     not null default current_timestamp,
@@ -40,7 +40,7 @@ create table users
 
 );
 
-create table user_facebook_login
+create table user_facebook_logins
 (
     `id`         integer unsigned      not null auto_increment,
     `created_at` datetime     not null default current_timestamp,
@@ -57,7 +57,7 @@ create table user_facebook_login
 
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
-drop table user_facebook_login;
+drop table user_facebook_logins;
 drop table users;
-drop table account_refresh_token;
-drop table account;
+drop table account_refresh_tokens;
+drop table accounts;

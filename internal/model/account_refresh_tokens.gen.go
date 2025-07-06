@@ -10,16 +10,16 @@ import (
 	"gorm.io/gorm"
 )
 
-const TableNameAccountRefreshToken = "account_refresh_token"
+const TableNameAccountRefreshToken = "account_refresh_tokens"
 
-// AccountRefreshToken mapped from table <account_refresh_token>
+// AccountRefreshToken mapped from table <account_refresh_tokens>
 type AccountRefreshToken struct {
 	ID            uint32         `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
 	CreatedAt     time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt     time.Time      `gorm:"column:updated_at;not null;default:CURRENT_TIMESTAMP" json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"column:deleted_at" json:"deleted_at"`
 	AccountID     uint32         `gorm:"column:account_id;not null;index:account_id,priority:1" json:"account_id"`
-	Token         string         `gorm:"column:token;not null" json:"token"`
+	Token         string         `gorm:"column:token;not null;index:account_refresh_token_idx_token,priority:1" json:"token"`
 	AccessTokenID string         `gorm:"column:access_token_id;not null" json:"access_token_id"`
 }
 

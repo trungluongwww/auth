@@ -1,0 +1,230 @@
+=== Post API Endpoints ===
+Base URL: http://localhost:8080/api/v1
+
+=============================================================================
+1. CREATE POST
+=============================================================================
+curl -X POST http://localhost:8080/api/v1/posts \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "title": "My First Post",
+    "content": "This is the content of my first post.",
+    "imageUrl": "https://example.com/image.jpg",
+    "isPublic": true
+  }'
+
+Expected Response:
+  - Status: 200 OK
+  - Body: {
+    "id": 1,
+    "title": "My First Post",
+    "content": "This is the content of my first post.",
+    "imageUrl": "https://example.com/image.jpg",
+    "isPublic": true,
+    "viewCount": 0,
+    "likeCount": 0,
+    "commentCount": 0,
+    "createdAt": "2024-01-01T12:00:00Z",
+    "updatedAt": "2024-01-01T12:00:00Z",
+    "user": {
+      "id": 1,
+      "name": "John Doe",
+      "email": "user@example.com"
+    },
+    "isLiked": false
+  }
+
+=============================================================================
+2. GET POST
+=============================================================================
+curl -X GET http://localhost:8080/api/v1/posts/1 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+Expected Response:
+  - Status: 200 OK
+  - Body: Same structure as create response
+
+=============================================================================
+3. GET POSTS (List with Pagination)
+=============================================================================
+curl -X GET "http://localhost:8080/api/v1/posts?page=1&limit=10&search=test" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+Expected Response:
+  - Status: 200 OK
+  - Body: {
+    "posts": [
+      {
+        "id": 1,
+        "title": "My First Post",
+        "content": "This is the content of my first post.",
+        "imageUrl": "https://example.com/image.jpg",
+        "isPublic": true,
+        "viewCount": 5,
+        "likeCount": 2,
+        "commentCount": 1,
+        "createdAt": "2024-01-01T12:00:00Z",
+        "updatedAt": "2024-01-01T12:00:00Z",
+        "user": {
+          "id": 1,
+          "name": "John Doe",
+          "email": "user@example.com"
+        },
+        "isLiked": true
+      }
+    ],
+    "totalCount": 1,
+    "page": 1,
+    "limit": 10
+  }
+
+=============================================================================
+4. GET USER POSTS
+=============================================================================
+curl -X GET "http://localhost:8080/api/v1/users/1/posts?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+Expected Response:
+  - Status: 200 OK
+  - Body: Same structure as get posts response
+
+=============================================================================
+5. UPDATE POST
+=============================================================================
+curl -X PUT http://localhost:8080/api/v1/posts/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "title": "Updated Post Title",
+    "content": "Updated content here.",
+    "imageUrl": "https://example.com/new-image.jpg",
+    "isPublic": false
+  }'
+
+Expected Response:
+  - Status: 200 OK
+  - Body: Updated post with same structure as create response
+
+=============================================================================
+6. DELETE POST
+=============================================================================
+curl -X DELETE http://localhost:8080/api/v1/posts/1 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+Expected Response:
+  - Status: 200 OK
+  - Body: Empty (deletion successful)
+
+=============================================================================
+7. LIKE POST
+=============================================================================
+curl -X POST http://localhost:8080/api/v1/posts/like \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "postId": 1
+  }'
+
+Expected Response:
+  - Status: 200 OK
+  - Body: Empty (like successful)
+
+=============================================================================
+8. UNLIKE POST
+=============================================================================
+curl -X DELETE http://localhost:8080/api/v1/posts/like \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "postId": 1
+  }'
+
+Expected Response:
+  - Status: 200 OK
+  - Body: Empty (unlike successful)
+
+=============================================================================
+USAGE EXAMPLES
+=============================================================================
+
+1. Complete Post Workflow:
+   # 1. Create a post
+   curl -X POST http://localhost:8080/api/v1/posts \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{"title":"Test Post","content":"Test content","isPublic":true}'
+
+   # 2. Get the created post
+   curl -X GET http://localhost:8080/api/v1/posts/1 \
+     -H "Authorization: Bearer YOUR_TOKEN"
+
+   # 3. Like the post
+   curl -X POST http://localhost:8080/api/v1/posts/like \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{"postId":1}'
+
+   # 4. Update the post
+   curl -X PUT http://localhost:8080/api/v1/posts/1 \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{"title":"Updated Title","content":"Updated content"}'
+
+   # 5. Unlike the post
+   curl -X DELETE http://localhost:8080/api/v1/posts/like \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{"postId":1}'
+
+   # 6. Delete the post
+   curl -X DELETE http://localhost:8080/api/v1/posts/1 \
+     -H "Authorization: Bearer YOUR_TOKEN"
+
+2. Search and Pagination:
+   # Get first page of posts
+   curl -X GET "http://localhost:8080/api/v1/posts?page=1&limit=5" \
+     -H "Authorization: Bearer YOUR_TOKEN"
+
+   # Search posts with keyword
+   curl -X GET "http://localhost:8080/api/v1/posts?search=technology&page=1&limit=10" \
+     -H "Authorization: Bearer YOUR_TOKEN"
+
+   # Get user's posts
+   curl -X GET "http://localhost:8080/api/v1/users/1/posts?page=1&limit=5" \
+     -H "Authorization: Bearer YOUR_TOKEN"
+
+3. Error Handling Examples:
+   # Create post without title
+   curl -X POST http://localhost:8080/api/v1/posts \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{"content":"Content without title","isPublic":true}'
+
+   # Update post you don't own
+   curl -X PUT http://localhost:8080/api/v1/posts/999 \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{"title":"Unauthorized Update"}'
+
+   # Like non-existent post
+   curl -X POST http://localhost:8080/api/v1/posts/like \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_TOKEN" \
+     -d '{"postId":999}'
+
+   # Get post without authentication
+   curl -X GET http://localhost:8080/api/v1/posts/1
+
+=============================================================================
+NOTES
+=============================================================================
+- All endpoints require authentication (JWT token)
+- Posts can be public or private (isPublic field)
+- View count is automatically incremented when getting a post
+- Like count is updated when liking/unliking posts
+- Only post owners can update or delete their posts
+- Search functionality works on title and content
+- Pagination uses page and limit parameters
+- Image URLs should be valid URLs (optional)
+- Private posts are only visible to their owners 

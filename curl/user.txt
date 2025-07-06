@@ -1,0 +1,44 @@
+=== User API Endpoints ===
+Base URL: http://localhost:8080/api/v1
+
+=============================================================================
+1. GET ME (Get Current User)
+=============================================================================
+curl -X GET http://localhost:8080/api/v1/users/me \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE"
+
+Expected Response:
+  - Status: 200 OK
+  - Body: {
+    "id": 1,
+    "name": "John Doe",
+    "email": "user@example.com"
+  }
+
+=============================================================================
+USAGE EXAMPLES
+=============================================================================
+
+1. Get Current User Profile:
+   curl -X GET http://localhost:8080/api/v1/users/me \
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+2. Error Handling Examples:
+   # Missing Authorization header
+   curl -X GET http://localhost:8080/api/v1/users/me
+
+   # Invalid token
+   curl -X GET http://localhost:8080/api/v1/users/me \
+     -H "Authorization: Bearer invalid_token"
+
+   # Expired token
+   curl -X GET http://localhost:8080/api/v1/users/me \
+     -H "Authorization: Bearer expired_token_here"
+
+=============================================================================
+NOTES
+=============================================================================
+- This endpoint requires authentication (JWT token)
+- The token should be included in the Authorization header as "Bearer <token>"
+- Returns the current user's profile information
+- If token is invalid or expired, returns 401 Unauthorized 
