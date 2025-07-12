@@ -20,7 +20,7 @@ func (u *postImpl) GetPost(context context.Context, userID uint32, postID uint32
 	}
 
 	// Increment view count
-	u.Repository.NewPost().IncrementViewCount(postID)
+	//u.Repository.NewPost().IncrementViewCount(postID)
 
 	user, err := u.Repository.NewUser().FirstRaw(&model.User{ID: post.UserID})
 	if err != nil {
@@ -58,7 +58,7 @@ func (u *postImpl) GetPosts(context context.Context, userID uint32, page, limit 
 	// Convert to response
 	postResponses := make([]response.PostResponse, len(posts))
 	for i, post := range posts {
-		postResponses[i] = *u.PostService.ConvertToPostResponse(&post.Post, post.User, post.IsLiked)
+		postResponses[i] = *u.PostService.ConvertToPostResponse(&post.Post, post.User, false)
 	}
 
 	return &response.PostListResponse{
@@ -99,7 +99,7 @@ func (u *postImpl) GetUserPosts(context context.Context, currentUserID, targetUs
 	// Convert to response
 	postResponses := make([]response.PostResponse, len(posts))
 	for i, post := range posts {
-		postResponses[i] = *u.PostService.ConvertToPostResponse(&post.Post, post.User, post.IsLiked)
+		postResponses[i] = *u.PostService.ConvertToPostResponse(&post.Post, post.User, false)
 	}
 
 	return &response.PostListResponse{

@@ -40,6 +40,7 @@ func (r *user) Delete(doc *model.User) error {
 
 func (r *user) FirstRaw(cond *model.User) (*model.User, error) {
 	var result *model.User
+
 	err := r.Tx.Where(cond).First(&result).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

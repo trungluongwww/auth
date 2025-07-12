@@ -9,8 +9,7 @@ import (
 
 type PostResult struct {
 	model.Post
-	User    *model.User `json:"user" gorm:"foreignKey:UserID;references:ID"`
-	IsLiked bool        `json:"is_liked"`
+	User *model.User `json:"user" gorm:"foreignKey:UserID;references:ID"`
 }
 
 type CommentResult struct {

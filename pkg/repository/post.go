@@ -75,17 +75,6 @@ func (r *post) FindByCondition(cond query.PostCondition, currentUserID uint32) (
 		return results, err
 	}
 
-	// Check if current user liked each post
-	if currentUserID != 0 {
-		for _, result := range results {
-			var count int64
-			r.Tx.Model(&model.PostLike{}).
-				Where("post_id = ? AND user_id = ?", result.ID, currentUserID).
-				Count(&count)
-			result.IsLiked = count > 0
-		}
-	}
-
 	return results, nil
 }
 
