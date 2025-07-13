@@ -10,7 +10,14 @@ import (
 )
 
 func AppMiddleware(env config.Env) []echo.MiddlewareFunc {
-	return []echo.MiddlewareFunc{cors, middleware.Logger(), middleware.Recover()}
+	loggerConfig := middleware.LoggerConfig{
+		Format: "\n👉 ${time_rfc3339_nano} ${remote_ip} -> ${uri} ${method} ${status}, latency: ${latency_human} ${error}",
+	}
+	return []echo.MiddlewareFunc{
+		cors,
+		middleware.LoggerWithConfig(loggerConfig),
+		middleware.Recover(),
+	}
 }
 
 var allowHeaders []string

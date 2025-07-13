@@ -19,6 +19,11 @@ func (u *postImpl) GetPost(context context.Context, userID uint32, postID uint32
 		return nil, errors.New("post not found")
 	}
 
+	// For guests (userID = 0), only allow access to public posts
+	if userID == 0 && !post.IsPublic {
+		return nil, errors.New("post not found")
+	}
+
 	// Increment view count
 	//u.Repository.NewPost().IncrementViewCount(postID)
 
@@ -27,8 +32,11 @@ func (u *postImpl) GetPost(context context.Context, userID uint32, postID uint32
 		return nil, err
 	}
 
-	// Check if user liked the post
-	isLiked, _ := u.Repository.NewPostLike().Exists(postID, userID)
+	// Check if user liked the post (only for authenticated users)
+	var isLiked bool
+	if userID > 0 {
+		isLiked, _ = u.Repository.NewPostLike().Exists(postID, userID)
+	}
 
 	return u.PostService.ConvertToPostResponse(post, user, isLiked), nil
 }
@@ -58,7 +66,13 @@ func (u *postImpl) GetPosts(context context.Context, userID uint32, page, limit 
 	// Convert to response
 	postResponses := make([]response.PostResponse, len(posts))
 	for i, post := range posts {
-		postResponses[i] = *u.PostService.ConvertToPostResponse(&post.Post, post.User, false)
+		// For guests (userID = 0), isLiked should always be false
+		isLiked := false
+		if userID > 0 {
+			// Check if authenticated user liked the post
+			isLiked, _ = u.Repository.NewPostLike().Exists(post.Post.ID, userID)
+		}
+		postResponses[i] = *u.PostService.ConvertToPostResponse(&post.Post, post.User, isLiked)
 	}
 
 	return &response.PostListResponse{

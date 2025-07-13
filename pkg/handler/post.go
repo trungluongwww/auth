@@ -98,9 +98,10 @@ func (h *Post) GetPost(context echo.Context) error {
 		ctx = custom.NewEchoCustom(context)
 	)
 
-	userID, err := ctx.GetCurrentUserID()
-	if err != nil {
-		return context.JSON(http.StatusUnauthorized, echo.Map{"message": "unauthorized"})
+	// Make authentication optional for guests
+	userID := 0
+	if id, err := ctx.GetCurrentUserID(); err == nil {
+		userID = id
 	}
 
 	postID, err := strconv.ParseUint(context.Param("id"), 10, 32)
@@ -120,9 +121,10 @@ func (h *Post) GetPosts(context echo.Context) error {
 		ctx = custom.NewEchoCustom(context)
 	)
 
-	userID, err := ctx.GetCurrentUserID()
-	if err != nil {
-		return context.JSON(http.StatusUnauthorized, echo.Map{"message": "unauthorized"})
+	// Make authentication optional for guests
+	userID := 0
+	if id, err := ctx.GetCurrentUserID(); err == nil {
+		userID = id
 	}
 
 	page, _ := strconv.Atoi(context.QueryParam("page"))
